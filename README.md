@@ -1,2 +1,1 @@
-Why I’m a Strong Fit for the Full Stack Developer Role at TechUp Labs
-Though my experience is  above 1.2 year, I’ve worked on high-impact projects that required a strong foundation in React, TypeScript, and performance optimization—core skills you’re looking for. My hands-on experience includes building responsive, scalable web apps, integrating REST/GraphQL APIs, and writing clean, maintainable code. I’ve also contributed to projects where UI/UX best practices and cross-browser compatibility were critical, which aligns well with TechUp Labs focus on modern, high-performance applications.
+the agility
