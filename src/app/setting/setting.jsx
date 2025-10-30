@@ -13,6 +13,7 @@ const Settings = () => {
 
 
   const token = Cookies.get("token");
+  const mobile = Cookies.get("mobile");
 
 
 
@@ -41,9 +42,9 @@ const Settings = () => {
         `${BASE_URL}/api/panel-change-password`,
         {
           old_password: passwordData.oldPassword,
-          password: passwordData.newPassword,
+          new_password: passwordData.newPassword,
           confirm_password: passwordData.confirmPassword,
-          username: user?.name,
+          username: mobile,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );

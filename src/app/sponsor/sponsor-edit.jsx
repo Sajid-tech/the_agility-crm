@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
-import { Edit, Loader2, SquarePlus, Upload, X } from "lucide-react";
+import { Loader2, Edit, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,27 +14,33 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useLocation } from "react-router-dom";
 
 import { toast } from "sonner";
 import BASE_URL from "@/config/base-url";
 import Cookies from "js-cookie";
 
-const SponsorEdit = ({sponsor}) => {
-
-  console.log("sajid",sponsor)
+const SponsorEdit = ({ sponsor }) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [formData, setFormData] = useState({
-    sponsors_image: "",
-    sponsors_status: "",
     sponsors_sort: "",
     sponsors_url: "",
+    sponsors_status: "Active",
   });
-  
+
   const queryClient = useQueryClient();
-  const { pathname } = useLocation();
+
+  React.useEffect(() => {
+    if (sponsor && open) {
+      setFormData({
+        sponsors_sort: sponsor.sponsors_sort || "",
+        sponsors_url: sponsor.sponsors_url || "",
+        sponsors_status: sponsor.sponsors_status || "",
+      });
+      setSelectedFile(null); // Reset file selection when dialog opens
+    }
+  }, [sponsor, open]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -57,8 +63,8 @@ const SponsorEdit = ({sponsor}) => {
   };
 
   const handleSubmit = async () => {
-    if (!selectedFile || !formData.sponsors_sort.trim() || !formData.sponsors_url.trim()) {
-      toast.error("Sponsor image, sort order, and URL are required");
+    if (!formData.sponsors_sort || !formData.sponsors_url.trim() || !formData.sponsors_status.trim()) {
+      toast.error("Sort order, URL, and status are required");
       return;
     }
 
@@ -68,12 +74,16 @@ const SponsorEdit = ({sponsor}) => {
       
       // Create FormData for file upload
       const submitData = new FormData();
-      submitData.append('sponsors_image', selectedFile);
+      if (selectedFile) {
+        submitData.append('sponsors_image', selectedFile);
+      }
       submitData.append('sponsors_sort', formData.sponsors_sort);
       submitData.append('sponsors_url', formData.sponsors_url);
+      submitData.append('sponsors_status', formData.sponsors_status);
+      submitData.append('_method', 'PUT'); // For Laravel PUT method
 
       const response = await axios.post(
-        `${BASE_URL}/api/sponsor`,
+        `${BASE_URL}/api/sponsor/${sponsor.id}`,
         submitData,
         {
           headers: { 
@@ -83,23 +93,24 @@ const SponsorEdit = ({sponsor}) => {
         }
       );
 
-      if (response?.data.code == 201 || response?.status === 201) {
-        toast.success(response.data.message || "Sponsor created successfully");
+      if (response?.data.code == 200 || response?.status === 200) {
+        toast.success(response.data.message || "Sponsor updated successfully");
 
         // Reset form
         setFormData({
           sponsors_sort: "",
           sponsors_url: "",
+          sponsors_status: "",
         });
         setSelectedFile(null);
         await queryClient.invalidateQueries(["sponsorList"]);
         setOpen(false);
       } else {
-        toast.error(response.data.message || "Failed to create sponsor");
+        toast.error(response.data.message || "Failed to update sponsor");
       }
     } catch (error) {
       toast.error(
-        error.response?.data?.message || "Failed to create sponsor"
+        error.response?.data?.message || "Failed to update sponsor"
       );
     } finally {
       setIsLoading(false);
@@ -118,15 +129,15 @@ const SponsorEdit = ({sponsor}) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default" className={``}>
-          <Edit className="h-4 w-4 " /> 
+        <Button variant="ghost" size="icon">
+          <Edit className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create New Sponsor</DialogTitle>
+          <DialogTitle>Edit Sponsor</DialogTitle>
           <DialogDescription>
-            Enter the details for the new sponsor
+            Update the details for this sponsor
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -148,11 +159,16 @@ const SponsorEdit = ({sponsor}) => {
                     htmlFor="sponsors_image"
                     className="cursor-pointer text-blue-600 hover:text-blue-700 font-medium"
                   >
-                    Click to upload image
+                    Click to upload new image
                   </label>
                   <p className="text-xs text-gray-500 mt-1">
-                    PNG, JPG, GIF, WebP up to 5MB
+                    Only WebP up to 5MB
                   </p>
+                  {sponsor?.sponsors_image && (
+                    <p className="text-xs text-green-600 mt-2">
+                      Current image will be kept if no new file is selected
+                    </p>
+                  )}
                 </div>
               ) : (
                 <div className="border border-gray-200 rounded-lg p-4">
@@ -194,12 +210,28 @@ const SponsorEdit = ({sponsor}) => {
               value={formData.sponsors_sort}
               onChange={handleInputChange}
             />
+            
             <Input
               id="sponsors_url"
               placeholder="Enter sponsor URL"
               value={formData.sponsors_url}
               onChange={handleInputChange}
             />
+
+            {/* Status Field */}
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Status</label>
+              <select
+                id="sponsors_status"
+                value={formData.sponsors_status}
+                onChange={handleInputChange}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="">Select Status</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
           </div>
           <Button
             onClick={handleSubmit}
@@ -209,10 +241,10 @@ const SponsorEdit = ({sponsor}) => {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating...
+                Updating...
               </>
             ) : (
-              "Create Sponsor"
+              "Update Sponsor"
             )}
           </Button>
         </div>

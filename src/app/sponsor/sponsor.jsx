@@ -103,8 +103,7 @@ const Sponsor = () => {
       }
       return response.data.data;
     },
-    keepPreviousData: true,
-    staleTime: 5 * 60 * 1000,
+ 
     
   });
 
@@ -156,7 +155,10 @@ const Sponsor = () => {
       header: "Image",
       cell: ({ row }) => {
         const imagePath = row.original.sponsors_image;
-        const fullImageUrl = imagePath ? `${imageBaseUrl}${imagePath}` : noImageUrl;
+        const dateNow = new Date().getTime();
+        const fullImageUrl = imagePath
+        ? `${imageBaseUrl}${imagePath}?dateNow=${dateNow}`
+        : `${noImageUrl}?dateNow=${dateNow}`;
     
         return (
           <div className="flex items-center">

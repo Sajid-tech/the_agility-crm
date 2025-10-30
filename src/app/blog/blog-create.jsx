@@ -20,6 +20,7 @@ import { Loader2, X, Upload } from "lucide-react";
 
 import { CKEditor } from "ckeditor4-react";
 import { toast } from 'sonner';
+import CategoryCreate from '../category/category-create';
 const BlogCreate = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -48,6 +49,22 @@ const BlogCreate = () => {
       const token = Cookies.get("token");
       const response = await axios.get(
         `${BASE_URL}/api/activeCategorys`,
+        {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+        }
+      );
+      return response.data.data;
+    },
+  });
+  const { data: galeryData, isLoading: galleryLoading } = useQuery({
+    queryKey: ['blog-gallery'],
+    queryFn: async () => {
+      const token = Cookies.get("token");
+      const response = await axios.get(
+        `${BASE_URL}/api/activeGallerys`,
         {
           headers: { 
             Authorization: `Bearer ${token}`,
@@ -193,6 +210,9 @@ const BlogCreate = () => {
                 placeholder="Enter blog title"
                 required
               />
+                 <p className="text-sm mt-1 text-gray-500">
+                This will be used as meta title.
+              </p>
             </div>
 
             {/* Blog Slug */}
@@ -221,11 +241,49 @@ const BlogCreate = () => {
                 rows={3}
                 required
               />
+                   <p className="text-sm mt-1 text-gray-500">
+                This will be used as meta description.
+              </p>
             </div>
 
             {/* Blog Description - CKEditor */}
-            <div className="">
-              <Label htmlFor="blog_description">Blog Description *</Label>
+            <div className="space-y-2">
+               <div className='flex flex-row items-center justify-between gap-10 md:w-96'>
+                         <Label htmlFor="blog_description">Blog Description *</Label>
+             <Select className="w-48">
+               <SelectTrigger className="flex-1">
+                 <SelectValue placeholder="Find Your Url For Image" />
+               </SelectTrigger>
+               <SelectContent>
+                 {galleryLoading ? (
+                   <SelectItem value="loading" disabled>
+                     Loading images link...
+                   </SelectItem>
+                 ) : (
+                   galeryData.map((gallery, index) => {
+                     const fullImageUrl = `${gallery.gallery_url}${gallery.gallery_image}`;
+                     return (
+                       <div
+                         key={index}
+                         className="flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100 rounded-md"
+                         onClick={() => {
+                           navigator.clipboard.writeText(fullImageUrl);
+                           toast.success(`Image URL copied: ${fullImageUrl}`);
+                         }}
+                       >
+                         <img
+                           src={fullImageUrl}
+                           alt={`Gallery ${index + 1}`}
+                           className="w-12 h-12 object-cover rounded border"
+                         />
+                         <span className="text-xs break-all text-gray-700">{gallery.gallery_image}</span>
+                       </div>
+                     );
+                   })
+                 )}
+               </SelectContent>
+             </Select>
+           </div>
               <div className="border rounded-md">
                 {/* <CKEditor
                   editor={ClassicEditor}
@@ -297,7 +355,7 @@ const BlogCreate = () => {
                       className="hidden"
                     />
                     <p className="text-sm text-gray-500 ">
-                      PNG, JPG, JPEG up to 5MB
+                    Webp up to 5MB
                     </p>
                   </div>
                 )}
@@ -305,8 +363,11 @@ const BlogCreate = () => {
             </div>
 <div>
             {/* Blog Categories */}
-            <div className="">
-              <Label>Blog Categories</Label>
+            <div className="space-y-2">
+          <div>
+         <div className='flex flex-row items-center justify-start gap-10'> <Label>Blog Categories</Label>
+         <CategoryCreate/></div>
+          </div>
               <div className="space-y-3">
                 <div className="flex gap-2">
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -358,8 +419,8 @@ const BlogCreate = () => {
             </div>
 
             {/* Number */}
-            <div className="">
-              <Label htmlFor="blog_front">Blog Front</Label>
+            <div className="space-y-2">
+              <Label htmlFor="blog_front">Blog Front Display Order (Shown on Front Page)</Label>
               <Input
                 id="blog_front"
                 type="number"
