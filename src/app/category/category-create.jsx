@@ -16,6 +16,7 @@ import {
 import BASE_URL from "@/config/base-url";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
+import { useLocation } from "react-router-dom";
 const CategoryCreate = () => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,7 +24,7 @@ const CategoryCreate = () => {
     category_name: "",
     category_status: "Active",
   });
-
+  const { pathname } = useLocation();
   const queryClient = useQueryClient();
 
   const handleSubmit = async () => {
@@ -66,9 +67,18 @@ const CategoryCreate = () => {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <div>
-          <Button variant="default">
-            <SquarePlus className="h-4 w-4" /> Category
-          </Button>
+          
+          {pathname === "/category" ? (
+          <Button  type="button" variant="default">
+          <SquarePlus className="h-4 w-4" /> Category
+        </Button>
+        ) : pathname === "/create-blog" ? (
+         <p className="text-xs text-blue-600  hover:text-red-800 cursor-pointer">
+                   <span className="flex items-center flex-row gap-1">
+                     <SquarePlus className="w-4 h-4" /> <span>Add</span>
+                   </span>
+                 </p>
+        ) : null}
         </div>
       </PopoverTrigger>
       <PopoverContent className="w-80">

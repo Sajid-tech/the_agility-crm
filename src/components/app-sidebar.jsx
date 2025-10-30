@@ -1,12 +1,15 @@
 import {
-  AudioWaveform,
-  Blocks,
-  Command,
-  Frame,
+  LayoutGrid,
+  Mail,
+  MessageSquare,
+  FileText,
+  HeartHandshake,
+  Inbox,
+  Image,
+  Settings,
   GalleryVerticalEnd,
-  Package,
-  Settings2,
-  ShoppingBag,
+  AudioWaveform,
+  Command,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -26,6 +29,7 @@ import { useState } from "react";
 export function AppSidebar({ ...props }) {
   const nameL = Cookies.get("name");
   const emailL = Cookies.get("email");
+  const company = Cookies.get("company");
   const [openItem, setOpenItem] = useState(null);
   const initialData = {
     user: {
@@ -35,7 +39,7 @@ export function AppSidebar({ ...props }) {
     },
     teams: [
       {
-        name: `THE AGILITY DEV`,
+        name: `${company}`,
         logo: GalleryVerticalEnd,
         plan: "",
       },
@@ -54,42 +58,46 @@ export function AppSidebar({ ...props }) {
       {
         title: "Category",
         url: "/category",
-        icon: Frame,
+        icon: LayoutGrid,
         isActive: false,
       },
-     
       {
         title: "Enquiry",
         url: "/enquiry",
-        icon: Frame,
+        icon: MessageSquare, 
         isActive: false,
       },
-     
       {
         title: "Blog",
         url: "/blog",
-        icon: Frame,
+        icon: FileText, 
         isActive: false,
       },
       {
         title: "Sponsor",
         url: "/sponsor",
-        icon: Frame,
+        icon: HeartHandshake, 
         isActive: false,
       },
-     
-      
-   
-
-     
-     
+      {
+        title: "Subscribe Email",
+        url: "/subscribe-email",
+        icon: Mail,
+        isActive: false,
+      },
+      {
+        title: "Gallery",
+        url: "/gallery",
+        icon: Image, 
+        isActive: false,
+      },
     ],
     navMainReport: [
 
       {
         title: "Settings",
         url: "/settings",
-        icon: Blocks,
+        icon: Settings,
         isActive: false,
       },
      

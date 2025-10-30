@@ -35,14 +35,14 @@ const SponsorCreate = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
+      
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       if (!validTypes.includes(file.type)) {
         toast.error("Please select a valid image file (JPEG, PNG, GIF, WebP)");
         return;
       }
       
-      // Validate file size (5MB max)
+      
       if (file.size > 5 * 1024 * 1024) {
         toast.error("File size should be less than 5MB");
         return;
@@ -53,8 +53,8 @@ const SponsorCreate = () => {
   };
 
   const handleSubmit = async () => {
-    if (!selectedFile || !formData.sponsors_sort.trim() || !formData.sponsors_url.trim()) {
-      toast.error("Sponsor image, sort order, and URL are required");
+    if (!selectedFile ) {
+      toast.error("Sponsor image");
       return;
     }
 
@@ -147,7 +147,7 @@ const SponsorCreate = () => {
                     Click to upload image
                   </label>
                   <p className="text-xs text-gray-500 mt-1">
-                    PNG, JPG, GIF, WebP up to 5MB
+                    Only WebP up to 5MB
                   </p>
                 </div>
               ) : (

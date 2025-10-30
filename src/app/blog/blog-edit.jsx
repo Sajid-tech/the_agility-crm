@@ -75,6 +75,22 @@ const BlogEdit = () => {
       return response.data.data;
     },
   });
+  const { data: galeryData, isLoading: galleryLoading } = useQuery({
+    queryKey: ['blog-gallery'],
+    queryFn: async () => {
+      const token = Cookies.get("token");
+      const response = await axios.get(
+        `${BASE_URL}/api/activeGallerys`,
+        {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+        }
+      );
+      return response.data.data;
+    },
+  });
 
 
   useEffect(() => {
@@ -231,7 +247,7 @@ const BlogEdit = () => {
     updateBlogMutation.mutate(formData);
   };
 
-  if (blogLoading) {
+  if (blogLoading || galleryLoading) {
     return (
       <div className="container mx-auto py-6">
         <Card>
@@ -298,7 +314,44 @@ const BlogEdit = () => {
 
             {/* Blog Description - CKEditor */}
             <div className="space-y-2">
+     
+              <div className='flex flex-row items-center justify-between gap-10 md:w-96'>
               <Label htmlFor="blog_description">Blog Description *</Label>
+  <Select className="w-48">
+    <SelectTrigger className="flex-1">
+      <SelectValue placeholder="Find Your Url For Image" />
+    </SelectTrigger>
+    <SelectContent>
+      {galleryLoading ? (
+        <SelectItem value="loading" disabled>
+          Loading images link...
+        </SelectItem>
+      ) : (
+        galeryData.map((gallery, index) => {
+          const fullImageUrl = `${gallery.gallery_url}${gallery.gallery_image}`;
+          return (
+            <div
+              key={index}
+              className="flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100 rounded-md"
+              onClick={() => {
+                navigator.clipboard.writeText(fullImageUrl);
+                toast.success(`Image URL copied: ${fullImageUrl}`);
+              }}
+            >
+              <img
+                src={fullImageUrl}
+                alt={`Gallery ${index + 1}`}
+                className="w-12 h-12 object-cover rounded border"
+              />
+              <span className="text-xs break-all text-gray-700">{gallery.gallery_image}</span>
+            </div>
+          );
+        })
+      )}
+    </SelectContent>
+  </Select>
+</div>
+
               <div className="border rounded-md">
               {editorKey > 0 && (
       <CKEditor
@@ -354,7 +407,7 @@ const BlogEdit = () => {
                       className="hidden"
                     />
                     <p className="text-sm text-gray-500 ">
-                      PNG, JPG, JPEG up to 5MB
+                     Webp up to 5MB
                     </p>
                   </div>
                 )}
@@ -420,7 +473,7 @@ const BlogEdit = () => {
 
             {/* Blog Front Number */}
             <div className="">
-              <Label htmlFor="blog_front">Blog Front Position</Label>
+              <Label htmlFor="blog_front">Blog Front Display Order (Shown on Front Page)</Label>
               <Input
                 id="blog_front"
                 type="number"

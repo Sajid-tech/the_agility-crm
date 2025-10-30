@@ -93,7 +93,7 @@ export default function LoginAuth() {
           return;
         }
   
-        const { UserInfo, version } = res.data;
+        const { UserInfo, version,company_detils } = res.data;
         const isProduction = window.location.protocol === "https:";
                
         const cookieOptions = {
@@ -108,10 +108,12 @@ export default function LoginAuth() {
         Cookies.set("id", UserInfo?.user?.user_type, cookieOptions);
         Cookies.set("name", UserInfo.user.name, cookieOptions);
         Cookies.set("username", UserInfo.user.name, cookieOptions);
+        Cookies.set("company", company_detils.company_name, cookieOptions);
     
  
         Cookies.set("user_type_id", UserInfo.user.user_type, cookieOptions);
         Cookies.set("email", UserInfo.user.email, cookieOptions);
+        Cookies.set("mobile", UserInfo.user.mobile, cookieOptions);
         Cookies.set("token-expire-time", UserInfo?.token_expires_at, cookieOptions);
         Cookies.set("ver_con", version?.version_panel, cookieOptions);
 
@@ -165,8 +167,8 @@ export default function LoginAuth() {
         <Card className="w-80 md:w-96 max-w-md bg-white/90 backdrop-blur-sm border-0 shadow-2xl">
           <CardHeader className="space-y-4 pb-6">
             <div className="flex justify-center">
-              <div className="p-1 rounded-2xl shadow-lg shadow-[var(--color)]">
-                <img src={logoLogin} className="" alt="logo_login"/>
+              <div className="p-4 rounded-2xl shadow-lg shadow-[var(--color)]">
+                <img src={'https://theagility.in/images/logo/logo1.png'} className="" alt="logo_login"/>
               </div>
             </div>
             <div className="text-center space-y-2">
@@ -198,8 +200,8 @@ export default function LoginAuth() {
                       placeholder="Enter your username"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      minLength={1}
-                      maxLength={50}
+                      minLength={10}
+                      maxLength={10}
                       required
                       className="h-11 border-gray-300 focus:border-[var(--color-border)] focus:ring-[var(--color-border)] transition-colors"
                       autoComplete="username"

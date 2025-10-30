@@ -3,7 +3,9 @@ import BlogEdit from "@/app/blog/blog-edit";
 import BlogList from "@/app/blog/blog-list";
 import CategoryList from "@/app/category/category-list";
 import Enquiry from "@/app/enquiry/enquiry";
+import GalleryList from "@/app/gallery/gallery-list";
 import Sponsor from "@/app/sponsor/sponsor";
+import SubscribeEmailList from "@/app/subscribe-email/subscribe-email-list";
 
 import Maintenance from "@/components/common/maintenance";
 import LoadingBar from "@/components/loader/loading-bar";
@@ -101,6 +103,22 @@ function AppRoutes() {
           element={
             <Suspense fallback={<LoadingBar />}>
               <Sponsor />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/subscribe-email"
+          element={
+            <Suspense fallback={<LoadingBar />}>
+              <SubscribeEmailList />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/gallery"
+          element={
+            <Suspense fallback={<LoadingBar />}>
+              <GalleryList />
             </Suspense>
           }
         />
